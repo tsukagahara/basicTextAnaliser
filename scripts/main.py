@@ -1,4 +1,5 @@
 import re
+from functools import cached_property
 
 class TextAnalyzer:
     def __init__(self, text):
@@ -9,14 +10,18 @@ class TextAnalyzer:
     def clean_text(self): # чистка текста (спец. символы)
         return ''.join(char for char in self.text if char not in self.special_chars)
             
-    def remove_spaces(self): # чистка текста (пробелы)
-        return self.text.replace(' ', '')
+    def remove_spaces(self, text=None): # чистка текста (пробелы)
+        target = text if text is not None else self.text
+        return target.replace(' ', '')
 
-    def remove_numbers(self): # чистка текста (цифры)
-        return ''.join(char for char in self.text if char not in self.numbers)
+    def remove_numbers(self, text=None):  # чистка текста (цифры)
+        target = text if text is not None else self.text
+        return ''.join(char for char in target if char not in self.numbers)
 
     def all_transforms(self): # все вышеперечисленные
-       return self.remove_spaces(self.remove_numbers(self.clean_text()))
+        cleaned = self.clean_text()
+        no_numbers = self.remove_numbers(cleaned)
+        return self.remove_spaces(no_numbers)       
 
     def split_sentences(self): # разделение на предложения
         pattern = r'(?<=[.!?])\s+(?=[А-ЯA-Z])|(?<=[.!?])$'
@@ -46,11 +51,14 @@ class TextAnalyzer:
     def extract_urls(self): # извлечение ссылок extract_urls()
         url_pattern = r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+[/\w\.-]*\??[/\w\.-=&%]*|www\.[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}[/\w\.-]*\??[/\w\.-=&%]*'
         return set(re.findall(url_pattern, self.text))
+    
+    def extract_phone_numbers(self): # поиск телефонных номеров 
+        phone_number_pattern = r'(?:\+\d{1,3}[\s-]?)?\(?\d{1,4}\)?[\s-]?(?:\d[\s-]?){6,12}\d'
+        return set(re.findall(phone_number_pattern, self.text))
 
     def extract_context(self, search_target): # поиск предложений, содержащих искомую строку
-        escaped_target = re.escape(search_target)
-        pattern = fr'[^.!?]*{escaped_target}[^.!?]*[.!?]'
-        return re.findall(pattern, self.text)
+        sentences = self.split_sentences()
+        return [sentence for sentence in sentences if search_target in sentence]
 
     def sentence_index_range(self, search_target): # возвращает количество и позиции всех вхождений строки 
         mentions = []
@@ -62,12 +70,3 @@ class TextAnalyzer:
             mentions.append(pos)
             start = pos + 1
         return len(mentions), mentions
-    
-        def extract_urls_context(self): # поиск предложений с использованием url
-            return 0
-
-
-# поиск телефонных номеров extract_phone_numbers()
-
-# print(all_transforms(userInput))
-# print(split_sentences(userInput))
