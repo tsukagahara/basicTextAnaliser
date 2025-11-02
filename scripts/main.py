@@ -1,72 +1,49 @@
-import re
-from functools import cached_property
+from tkinter import *
 
-class TextAnalyzer:
-    def __init__(self, text):
-        self.text = text
-        self.special_chars = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~±÷×€£¥¢₹₽₴«»„"''"'’…·•¶§©®™°µ†‡◊"
-        self.numbers = '0123456789'
-    
-    def clean_text(self): # чистка текста (спец. символы)
-        return ''.join(char for char in self.text if char not in self.special_chars)
-            
-    def remove_spaces(self, text=None): # чистка текста (пробелы)
-        target = text if text is not None else self.text
-        return target.replace(' ', '')
+# Базовые цвета
+BG_DARK = '#121212'      # Основной фон
+BG_CARD = '#1e1e1e'      # Карточки, панели
 
-    def remove_numbers(self, text=None):  # чистка текста (цифры)
-        target = text if text is not None else self.text
-        return ''.join(char for char in target if char not in self.numbers)
+# Акцентные (тускло-синие)
+ACCENT_PRIMARY = '#2a4a6d'   # Основной акцент
+ACCENT_SECONDARY = '#3a5a7d' # Второстепенный
+ACCENT_LIGHT = '#4a6a8d'     # Светлый акцент
 
-    def all_transforms(self): # все вышеперечисленные
-        cleaned = self.clean_text()
-        no_numbers = self.remove_numbers(cleaned)
-        return self.remove_spaces(no_numbers)       
+# Текст
+TEXT_MAIN = '#e0e0e0'    # Основной текст
+TEXT_MUTED = '#a0a0a0'   # Второстепенный текст
 
-    def split_sentences(self): # разделение на предложения
-        pattern = r'(?<=[.!?])\s+(?=[А-ЯA-Z])|(?<=[.!?])$'
-        sentences = re.split(pattern, self.text)
-        return [s.strip() for s in sentences if s.strip()]
+root = Tk()
 
-    def split_words(self): # разделение на слова
-        cleaned = self.remove_numbers(self.clean_text())
-        return [word for word in cleaned.split() if word]
+root['bg'] = '#000000'
+root.title('basicTextAnalyzer')
+root.minsize(500, 500)
 
-    def count_chars(self): # подсчёт символов (с пробелами и со всеми трансформациями)
-        return len(self.all_transforms()), len(self.text)
-    
-    def aux_count_chars(self): # подсчёт символов каждого преобразования
-        return len(self.clean_text()), len(self.remove_numbers()), len(self.remove_spaces())
+main_frame = Frame(root, bg=BG_DARK)
+main_frame.place(relx=0.01, rely=0.01, relwidth=0.98, relheight=0.98)
 
-    def count_words(self): # подсчёт слов
-        return len(self.split_words())
+# Боковая панель внутри main_frame
+aside = Frame(main_frame, bg=BG_CARD)
+aside.place(relx=0, rely=0, width=100, relheight=1)
 
-    def count_sentences(self): # подсчёт предложений
-        return len(self.split_sentences())
+# Контентная область внутри main_frame (справа от aside)
+content = Frame(main_frame, bg=BG_DARK)
+content.place(relx=0, x=105, rely=0, relwidth=1, relheight=1)
 
-    def extract_emails(self): # поиск email-адресов
-        email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-        return set(re.findall(email_pattern, self.text))
+# Остальные элементы внутри content
+header = Frame(content, bg=BG_CARD)
+header.place(relx=0, rely=0, relwidth=1, relheight=0.05)
 
-    def extract_urls(self): # извлечение ссылок extract_urls()
-        url_pattern = r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+[/\w\.-]*\??[/\w\.-=&%]*|www\.[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}[/\w\.-]*\??[/\w\.-=&%]*'
-        return set(re.findall(url_pattern, self.text))
-    
-    def extract_phone_numbers(self): # поиск телефонных номеров 
-        phone_number_pattern = r'(?:\+\d{1,3}[\s-]?)?\(?\d{1,4}\)?[\s-]?(?:\d[\s-]?){6,12}\d'
-        return set(re.findall(phone_number_pattern, self.text))
+textarea = Frame(content, bg=BG_CARD)
+textarea.place(relx=0, rely=0.055, relwidth=1, relheight=0.89)
 
-    def extract_context(self, search_target): # поиск предложений, содержащих искомую строку
-        sentences = self.split_sentences()
-        return [sentence for sentence in sentences if search_target in sentence]
+footer = Frame(content, bg=BG_CARD)
+footer.place(relx=0, rely=0.95, relwidth=1, relheight=0.05)
 
-    def sentence_index_range(self, search_target): # возвращает количество и позиции всех вхождений строки 
-        mentions = []
-        start = 0
-        while True:
-            pos = self.text.find(search_target, start)
-            if pos == -1:
-                break
-            mentions.append(pos)
-            start = pos + 1
-        return len(mentions), mentions
+footer_annotations = Frame(footer, bg=ACCENT_PRIMARY)
+footer_annotations.place(relx=0.001, rely=0.02, relwidth=0.7, relheight=0.96)
+
+footer_stat = Frame(footer, bg=ACCENT_PRIMARY)
+footer_stat.place(relx=0.702, rely=0.02, relwidth=0.7, relheight=0.96)
+
+root.mainloop()
