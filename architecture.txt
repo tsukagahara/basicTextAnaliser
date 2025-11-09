@@ -10,9 +10,10 @@ text_editor_noble/
 │   │   ├── main_window.py      # Главное окно
 │   ├── widgets/
 │   │   ├── __init__.py
+│   │   ├── header.py      	# Шапка
 │   │   ├── text_editor.py      # Кастомный текстовый редактор
-│   │   ├── menu_bar.py         # Панель меню
-│   │   └── status_bar.py       # Статус бар
+│   │   ├── left_aside.py
+│   │   └── right_aside.py
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── file_manager.py     # Управление файлами

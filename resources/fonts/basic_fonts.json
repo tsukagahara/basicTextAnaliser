@@ -6,7 +6,8 @@
     "style": "normal",
     "line_height": 1.4,
     "letter_spacing": 0,
-    "color": "#e0e0e0"
+    "color": "#e0e0e0",
+    "fontIsDark": false
   },
   "monospace": {
     "family": "Consolas",
