@@ -28,8 +28,6 @@ class colors_is_suitable(QDialog):
 
         self.setup_ui()
 
-        print(2)
-
     def setup_ui(self):
         import src.core as core
         layout = QVBoxLayout(self)

@@ -17,7 +17,6 @@ class Yarn:
 
     def check_terms(self):
         if not self.terms_manager.search_termsAccepted():
-            print("Условия не приняты. Приложение завершает работу.")
             self.app.quit()
             return
 
