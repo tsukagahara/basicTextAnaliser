@@ -29,20 +29,40 @@ class CustomHeader(QWidget):
             if event.button() == Qt.LeftButton and not self.is_in_resize_zone(event.pos()):
                 self.dragging = True
                 self.drag_position = event.globalPos() - self.window().frameGeometry().topLeft()
+                if hasattr(self.window(), 'resize_handler'):
+                    self.window().resize_handler.moving = True
+                self.grabMouse()
                 return True
             return False
             
         elif event.type() == QEvent.MouseMove:
-            if self.is_in_resize_zone(event.pos()):
-                return False
             if self.dragging and event.buttons() == Qt.LeftButton:
-                self.window().move(event.globalPos() - self.drag_position)
+                global_pos = event.globalPos()
+                screen = self.window().screen().availableGeometry()
+                
+                if (global_pos.y() <= 5 or 
+                    global_pos.x() <= 5 or  
+                    global_pos.x() >= screen.width() - 5):
+                    
+                    local_pos = event.pos()
+                    new_x = global_pos.x() - local_pos.x() - self.width() // 2
+                    new_y = global_pos.y() - local_pos.y() - self.height() // 2
+                    
+                    new_x = max(screen.left(), min(new_x, screen.right() - self.window().width()))
+                    new_y = max(screen.top(), min(new_y, screen.bottom() - self.window().height()))
+                    
+                    self.window().move(new_x, new_y)
+                else:
+                    self.window().move(global_pos - self.drag_position)
                 return True
             return False
             
         elif event.type() == QEvent.MouseButtonRelease:
             if event.button() == Qt.LeftButton:
                 self.dragging = False
+                if hasattr(self.window(), 'resize_handler'):
+                    self.window().resize_handler.moving = False
+                self.releaseMouse()
             return False
             
         return super().eventFilter(obj, event)
