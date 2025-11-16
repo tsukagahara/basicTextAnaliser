@@ -11,12 +11,9 @@ from widgets.header import CustomHeader
 
 
 def get_project_root():
-    """Определяет корень проекта в dev и exe режимах"""
     if hasattr(sys, '_MEIPASS'):
-        # EXE режим - все файлы рядом с exe
         return os.path.dirname(sys.executable)
     else:
-        # Dev режим - на 3 уровня выше от текущего файла  
         return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 class MainWindow(QMainWindow):
@@ -118,8 +115,10 @@ class MainWindow(QMainWindow):
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
         
+        self.setMouseTracking(True)
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
+        central_widget.setMouseTracking(True)
         self.layout = QVBoxLayout(central_widget)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
@@ -127,6 +126,7 @@ class MainWindow(QMainWindow):
     
     def create_widgets(self):
         self.header = CustomHeader(theme=self.theme_default, parent=self)
+        self.header.setMouseTracking(True)
         self.layout.addWidget(self.header)
         self.header.close_btn.clicked.connect(self.close)
 
@@ -135,6 +135,10 @@ class MainWindow(QMainWindow):
         self.block1 = QWidget()
         self.block2 = QWidget()
         self.block3 = QWidget()
+
+        self.block1.setMouseTracking(True)
+        self.block2.setMouseTracking(True)
+        self.block3.setMouseTracking(True)
 
         self.block1_layout = QVBoxLayout(self.block1)
         self.block2_layout = QVBoxLayout(self.block2)
