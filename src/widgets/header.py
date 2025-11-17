@@ -1,9 +1,8 @@
 import os
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QSizePolicy
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QSizePolicy, QApplication
 from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import QPainter, QColor, QPixmap
 import utils.helpers as helpers
-
 class CustomHeader(QWidget):
     def __init__(self, theme=None, parent=None):
         super().__init__(parent)
@@ -27,6 +26,40 @@ class CustomHeader(QWidget):
             
         elif event.type() == QEvent.MouseMove:
             if self.dragging and event.buttons() == Qt.LeftButton:
+                # Если статус True, свернуть в окно 
+                if (hasattr(self.window(), 'resize_handler') and 
+                    hasattr(self.window().resize_handler, 'toggle_maximize_status') and
+                    self.window().resize_handler.toggle_maximize_status and
+                    self.window().isMaximized()):
+                    
+                    self.window().resize_handler.toggle_maximize_status = False
+                    self.maximize_btn.click()
+                    
+                    # Дать окну время принять нормальный размер
+                    QApplication.processEvents()
+                    
+                    global_pos = event.globalPos()
+                    screen = self.window().screen().availableGeometry()
+                    
+                    # Вычисляение позиции по X
+                    window_width = self.window().width()
+                    new_x = global_pos.x() - window_width // 2
+
+                    print("Window width:", window_width, "New X:", new_x)
+                    
+                    # Ограничие позиции по X
+                    new_x = max(screen.left(), min(new_x, screen.right() - window_width))
+
+                    print("Final X:", new_x)
+                    
+                    # Y установить в 0
+                    self.window().move(new_x, 0)
+                    
+                    # drag_position для продолжения перемещения
+                    self.drag_position = event.globalPos() - self.window().frameGeometry().topLeft()
+
+                    return True
+
                 global_pos = event.globalPos()
                 screen = self.window().screen().availableGeometry()
                 
@@ -65,9 +98,8 @@ class CustomHeader(QWidget):
     def setup_ui(self):
         self.setObjectName("CustomHeader")
         layout = QHBoxLayout(self)
-        self.setFixedHeight(35)
+        self.setFixedHeight(32)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        # layout.setContentsMargins(10, 5, 10, 5)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         self.installEventFilter(self)

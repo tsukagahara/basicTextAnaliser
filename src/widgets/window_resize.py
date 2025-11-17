@@ -1,8 +1,22 @@
-from PySide6.QtCore import Qt, QPoint, QRect
+from PySide6.QtWidgets import QMainWindow
+from PySide6.QtCore import Qt, QRect
 from PySide6.QtGui import QCursor
 
+def toggle_maximize(window: QMainWindow):
+    if window.isMaximized():
+        window.showNormal()
+        if hasattr(window, 'resize_handler'):
+            window.resize_handler.moving = False
+            window.resize_handler.toggle_maximize_status = True
+    else:
+        window.showMaximized()
+        if hasattr(window, 'resize_handler'):
+            window.resize_handler.moving = True
+            window.resize_handler.toggle_maximize_status = True
+
+
 class ResizeHandler:
-    def __init__(self, window, margin=8):
+    def __init__(self, window, margin=5):
         self.window = window
         self.margin = margin
         self.dragging = False
@@ -10,6 +24,7 @@ class ResizeHandler:
         self.drag_direction = None
         self.drag_start_pos = None
         self.drag_start_geometry = None
+        self.toggle_maximize_status = False
 
         self.window.setMouseTracking(True)
     
@@ -119,3 +134,25 @@ class ResizeHandler:
         
         if new_geometry.width() >= self.window.minimumWidth() and new_geometry.height() >= self.window.minimumHeight():
             self.window.setGeometry(new_geometry)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

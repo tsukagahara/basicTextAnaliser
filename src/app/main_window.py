@@ -4,9 +4,10 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
 from PySide6.QtGui import QIcon, Qt
 from PySide6.QtCore import QRect
 
-from widgets.window_resize import ResizeHandler
+from widgets.window_resize import ResizeHandler, toggle_maximize
 import utils.helpers as helpers
 from widgets.header import CustomHeader
+import widgets.window_resize
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -38,14 +39,25 @@ class MainWindow(QMainWindow):
         self.font_default = self.font_default or {}
         if not self.font_default:
             self.font_default = {
-                'isDark': True, 
-                'bg_dark': '#111111', 
-                'bg_card': '#121212', 
-                'accent_primary': '#202020', 
-                'accent_secondary': '#252525', 
-                'accent_light': '#7a7a7a', 
-                'text_main': '#e0e0e0', 
-                'text_muted': '#a0a0a0'
+                "main": {
+                    "family": "Segoe UI",
+                    "size": 12,
+                    "weight": "normal", 
+                    "style": "normal",
+                    "line_height": 1.4,
+                    "letter_spacing": 0,
+                    "color": "#e0e0e0",
+                    "fontIsDark": False
+                },
+                "monospace": {
+                    "family": "Consolas",
+                    "size": 12,
+                    "weight": "normal",
+                    "style": "normal",
+                    "line_height": 1.2,
+                    "letter_spacing": 0,
+                    "color": "#e0e0e0"
+                }
             }
             
         self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
@@ -147,7 +159,7 @@ class MainWindow(QMainWindow):
         self.header.setMouseTracking(True)
         self.layout.addWidget(self.header)
         self.header.minimize_btn.clicked.connect(self.showMinimized)
-        self.header.maximize_btn.clicked.connect(self.toggle_maximize)
+        self.header.maximize_btn.clicked.connect(self.toggle_maximize_window)
         self.header.close_btn.clicked.connect(self.close)
 
         main_content = QHBoxLayout()
@@ -179,11 +191,12 @@ class MainWindow(QMainWindow):
         
         self.layout.addLayout(main_content)
     
-    def toggle_maximize(self):
-        if self.isMaximized():
-            self.showNormal()
-        else:
-            self.showMaximized()  
+    def toggle_maximize_window(self):
+        toggle_maximize(self)
+        # if self.isMaximized():
+        #     self.showNormal()
+        # else:
+        #     self.showMaximized() 
     
     def on_close(self):
         self.close()
