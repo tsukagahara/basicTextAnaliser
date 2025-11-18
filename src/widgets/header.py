@@ -44,13 +44,9 @@ class CustomHeader(QWidget):
                     # Вычисляение позиции по X
                     window_width = self.window().width()
                     new_x = global_pos.x() - window_width // 2
-
-                    print("Window width:", window_width, "New X:", new_x)
                     
                     # Ограничие позиции по X
                     new_x = max(screen.left(), min(new_x, screen.right() - window_width))
-
-                    print("Final X:", new_x)
                     
                     # Y установить в 0
                     self.window().move(new_x, 0)
@@ -112,10 +108,7 @@ class CustomHeader(QWidget):
         self.logo_label = QLabel()
         self.logo_label.setContentsMargins(5, 0, 5, 0)
         self.logo_pixmap = QPixmap(self.logo_img_path)
-        if not self.logo_pixmap.isNull():
-            self.logo_label.setPixmap(self.logo_pixmap.scaled(24, 24, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        else:
-            print(self.logo_img_path)
+        self.logo_label.setPixmap(self.logo_pixmap.scaled(24, 24, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         
         layout.addWidget(self.logo_label)
         layout.addWidget(self.title_label)

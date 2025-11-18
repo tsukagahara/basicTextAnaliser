@@ -134,25 +134,3 @@ class ResizeHandler:
         
         if new_geometry.width() >= self.window.minimumWidth() and new_geometry.height() >= self.window.minimumHeight():
             self.window.setGeometry(new_geometry)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
