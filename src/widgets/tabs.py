@@ -31,6 +31,13 @@ class tabs(QWidget):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
+
+        add_tab_btn = QPushButton("+")
+        add_tab_btn.setFixedSize(50, 18)
+        add_tab_btn.setCursor(Qt.PointingHandCursor)
+        add_tab_btn.setProperty("class", "tab")
+        add_tab_btn.setFont(QFont("Monospace", 10))
+        layout.addWidget(add_tab_btn)
         
         self.tabs_container = QWidget()
         self.tabs_container.setFixedHeight(20)
