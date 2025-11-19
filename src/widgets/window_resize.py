@@ -31,9 +31,6 @@ class ResizeHandler:
     def get_resize_direction(self, pos):
         x, y = pos.x(), pos.y()
         w, h = self.window.width(), self.window.height()
-        # print(f"x={x}, y={y}, w={w}, h={h}, margin={self.margin}")
-        # print(f"x<=margin: {x<=self.margin}, x>=w-margin: {x>=w-self.margin}")
-        # print(f"y<=margin: {y<=self.margin}, y>=h-margin: {y>=h-self.margin}")
             
         if x <= self.margin and y <= self.margin:
             return 'top_left'
@@ -81,25 +78,18 @@ class ResizeHandler:
     def mouse_move(self, event):
         if self.moving:
             return False
-
-        # print("MOUSE MOVE CALLED - EVENT RECEIVED")
-        # print(f"Dragging: {self.dragging}")
         
         if not self.dragging:
             direction = self.get_resize_direction(event.pos())
-            # print(f"Direction: {direction}")
             
             if direction:
-                # print("Has direction - returning True")
                 cursor_type = self.direction_to_cursor(direction)
                 self.window.setCursor(QCursor(cursor_type))
                 return True
             else:
-                # print("No direction - returning False")
                 self.window.unsetCursor()
                 return False
         else:
-            # print("Dragging - returning True")
             self.handle_resize(event.globalPos())
             return True
 

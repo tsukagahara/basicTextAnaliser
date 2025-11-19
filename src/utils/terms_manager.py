@@ -9,46 +9,34 @@ class TermsManager:
     def __init__(self):
         self.base_path = helpers.get_project_root()
         self.config_path = os.path.join(self.base_path, "config", "config.json")
-        # print(f"Загружаем config из: {self.config_path}")
         
         self.config_data = helpers.get_json_property(f'{self.config_path}')
-        # print(f"Config data: {self.config_data}")
 
         if self.config_data is None:
-            # print("Config файл не найден или пустой, создаем базовый")
             self.config_data = {"termsAccepted": False, "theme": "dark_theme", "fonts": "basic_fonts"}
 
     def search_termsAccepted(self):
-        # print(f"Проверяем termsAccepted: {self.config_data.get('termsAccepted')}")
         
         if self.config_data.get("termsAccepted") == True:
-            # print("Terms уже приняты, открываем главное окно")
             return True
-        else: 
-            # print("Terms не приняты, показываем диалог")
+        else:
             return self.show_terms_dialog()
 
     def show_terms_dialog(self):
-        # print("Открываем диалог лицензии")
         dialog = TermsDialog()
         result = dialog.exec()
-        # print(f"Результат диалога: {result}")
 
         if result == QDialog.DialogCode.Accepted:
-            # print("Пользователь принял лицензию")
             self.config_data["termsAccepted"] = True
             self.save_config()
             return True
-
-        # print("Пользователь отклонил лицензию")
+        
         return False
 
     def save_config(self):
-        # print("Сохраняем config...")
         os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
         with open(self.config_path, "w", encoding="utf-8") as f:
             json.dump(self.config_data, f, indent=2, ensure_ascii=False)
-        # print(f"Config сохранен: {self.config_data}")
 
 
 class TermsDialog(QDialog):
@@ -85,7 +73,6 @@ class TermsDialog(QDialog):
         """)
         layout.addWidget(text_edit)
 
-        # Кнопки принятия/отклонения
         button_layout = QHBoxLayout()
         
         reject_btn = QPushButton("Не принимаю")

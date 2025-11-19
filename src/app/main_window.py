@@ -198,10 +198,6 @@ class MainWindow(QMainWindow):
     
     def toggle_maximize_window(self):
         toggle_maximize(self)
-        # if self.isMaximized():
-        #     self.showNormal()
-        # else:
-        #     self.showMaximized() 
     
     def on_close(self):
         self.close()
