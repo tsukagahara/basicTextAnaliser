@@ -1,5 +1,6 @@
 import os
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QSizePolicy, QScrollArea
+import json
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QSizePolicy, QScrollArea
 from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import QPainter, QColor, QFont
 import utils.helpers as helpers
@@ -32,12 +33,13 @@ class tabs(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        add_tab_btn = QPushButton("+")
-        add_tab_btn.setFixedSize(50, 18)
-        add_tab_btn.setCursor(Qt.PointingHandCursor)
-        add_tab_btn.setProperty("class", "tab")
-        add_tab_btn.setFont(QFont("Monospace", 10))
-        layout.addWidget(add_tab_btn)
+        self.add_tab_btn = QPushButton("+")
+        self.add_tab_btn.setFixedSize(50, 18)
+        self.add_tab_btn.setCursor(Qt.PointingHandCursor)
+        self.add_tab_btn.setProperty("class", "tab")
+        self.add_tab_btn.setFont(QFont("Monospace", 10))
+        self.add_tab_btn.clicked.connect(self.on_add_tab_clicked)
+        layout.addWidget(self.add_tab_btn)
         
         self.tabs_container = QWidget()
         self.tabs_container.setFixedHeight(20)
@@ -71,7 +73,16 @@ class tabs(QWidget):
         self.scroll_area.setWidgetResizable(False)
         
         layout.addWidget(self.scroll_area)
-    
+
+    def on_add_tab_clicked(self):
+        print("Кнопка '+' нажата!")
+        print(helpers.get_json_property(self.path_tabs))
+        file_name, directory = helpers.open_file_dialog(self)
+        helpers.add_json_property(self.path_tabs, file_name, directory)
+        print(helpers.get_json_property(self.path_tabs))
+        self.reload_tabs()
+        
+
     def reload_tabs(self):
         for i in reversed(range(self.tabs_layout.count())):
             widget = self.tabs_layout.itemAt(i).widget()
@@ -122,7 +133,7 @@ class tabs(QWidget):
                 font-weight: 600;
             }}
             QPushButton[class="tab"]:hover {{ 
-                background-color: #292929;
+                background-color: {self.btn_hover_bg_color};
             }}
         """)
 
@@ -144,7 +155,7 @@ class tabs(QWidget):
                 font-weight: 600;
             }}
             QPushButton:hover {{
-                background: #292929;
+                background: {self.btn_hover_bg_color};
             }}
             QScrollBar:horizontal {{
                 background: white;

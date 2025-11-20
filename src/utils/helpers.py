@@ -1,9 +1,23 @@
 import os
 import sys
 import json
-from PySide6.QtWidgets import (QDialog, QVBoxLayout,
-                            QLabel, QPushButton, QHBoxLayout)
+from PySide6.QtWidgets import (QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QFileDialog)
 from PySide6.QtCore import Qt
+
+def open_file_dialog(self):
+    file_path, _ = QFileDialog.getOpenFileName(
+        self, 
+        "Выберите файл",  # заголовок
+        "",  # начальная директория
+        "All Files (*)"  # фильтр файлов
+    )
+    
+    if file_path:
+        file_name = os.path.basename(file_path)  # название файла
+        directory = os.path.dirname(file_path)   # путь к папке
+        
+        return file_name, directory
+    return None, None
 
 def get_project_root():
     if hasattr(sys, '_MEIPASS'):
@@ -23,6 +37,28 @@ def get_json_property(path, preference_name=""):
         raise ValueError(f"Ошибка парсинга JSON в файле {path}: {e}")
     except Exception as e:
         raise RuntimeError(f"Ошибка при чтении файла {path}: {e}")
+    
+def add_json_property(path, property, value):
+    try:
+        if not property or not isinstance(property, str):
+            return 'invalid_key_name'
+
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+        data[property] = value
+
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+
+        return 'success'
+
+    except FileNotFoundError:
+        return 'error: JSON файл не найден'
+    except json.JSONDecodeError as e:
+        return f'error: Ошибка парсинга JSON: {e}'
+    except Exception as e:
+        return f'error: Ошибка при работе с файлом: {e}'
 
 class colors_is_suitable(QDialog):
     def __init__(self, theme_default, main_font_style, base_path, parent=None):
