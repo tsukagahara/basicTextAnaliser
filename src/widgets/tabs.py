@@ -1,10 +1,8 @@
 import os
-import json
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QSizePolicy, QScrollArea
 from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import QPainter, QColor, QFont, QFontMetrics
 import utils.helpers as helpers
-import utils.color_utils as color_utils
 
 class tabs(QWidget):
     def __init__(self, theme=None, parent=None):
@@ -69,7 +67,7 @@ class tabs(QWidget):
         # add: load file
         file_name, directory = helpers.open_file_dialog(self)
         helpers.add_json_property(self.path_tabs, file_name, directory)
-        self.reload_tabs()
+        self.reload_tabs(file_name, directory)
 
     def on_remove_tab_clicked(self, name):
         # add: save file
@@ -77,7 +75,7 @@ class tabs(QWidget):
         self.reload_tabs()
         
 
-    def reload_tabs(self):
+    def reload_tabs(self, file_name=None, directory=None):
         for i in reversed(range(self.tabs_layout.count())):
             widget = self.tabs_layout.itemAt(i).widget()
             if widget:
@@ -88,48 +86,42 @@ class tabs(QWidget):
         self.property_tabs = helpers.get_json_property(self.path_tabs)
         self.count_tabs = len(self.property_tabs)
         
-        self.add_tab()
+        self.add_tab(file_name, directory)
         
         self.tabs_container.setMinimumWidth(self.tabs_width)
     
-    def add_tab(self):
+    def add_tab(self, file_name=None, directory=None):
         font = QFont("Monospace", 10)
         metrics = QFontMetrics(font)
         
         for i in range(self.count_tabs):
             name = list(self.property_tabs.keys())[i]
-            if len(name) > 15:
-                display_name = name[:15] + '..'
-            else:
-                display_name = name
             
-            text_width = metrics.horizontalAdvance(display_name)
-            btn_width = text_width + 30
+            text_width = metrics.horizontalAdvance(name)
+            btn_width = text_width + 40
             
             tab_widget = QWidget()
             tab_widget.setProperty("class", "tab_widget")
-            tab_layout = QHBoxLayout(tab_widget)
-            tab_layout.setContentsMargins(0, 0, 0, 0)
-            tab_layout.setSpacing(0)
-            tab_layout.setAlignment(Qt.AlignLeft)
+            tab_widget.setStyleSheet("margin-right: 10px;")
+            tabs_layout = QHBoxLayout(tab_widget)
+            tabs_layout.setAlignment(Qt.AlignLeft)
+            tabs_layout.setContentsMargins(0, 0, 0, 0)
             
-            btn = QPushButton(display_name)
+            btn = QPushButton(name)
             btn.setFixedSize(btn_width, 18)
-            btn.setContentsMargins(0, 0, 0, 0)
             btn.setCursor(Qt.PointingHandCursor)
             btn.setProperty("class", "tab")
             btn.setFont(font)
             
             btn_remove = QPushButton('x')
-            btn_remove.setFixedSize(20, 18)
-            btn_remove.setContentsMargins(0, 0, 0, 0)
+            btn_remove.setFixedSize(40, 18)
             btn_remove.setCursor(Qt.PointingHandCursor)
             btn_remove.setProperty("class", "tab")
             btn_remove.setFont(QFont("Monospace", 10))
             btn_remove.clicked.connect(lambda checked, n=name: self.on_remove_tab_clicked(n))
             
-            tab_layout.addWidget(btn)
-            tab_layout.addWidget(btn_remove)
+            tabs_layout.addWidget(btn)
+            tabs_layout.addWidget(btn_remove)
             
             tab_width = btn_width + 20
             self.tabs_width += tab_width
@@ -138,7 +130,7 @@ class tabs(QWidget):
             
             self.tabs_layout.addWidget(tab_widget)
             
-            self.tabs[display_name] = {'container': tab_widget, 'btn': btn, 'btn_remove': btn_remove}
+            self.tabs[name] = {'container': tab_widget, 'btn': btn, 'btn_remove': btn_remove}
     
     def apply_theme(self):
         self.bg_card = self.theme.get('bg_card')
@@ -152,29 +144,30 @@ class tabs(QWidget):
         self.update()        
         self.setStyleSheet(f"""
             QPushButton[class="tab"] {{
+                background-color: transparent;
                 color: {self.text_main};
-                background: transparent;
-                padding-left: 5px;
-                padding-right: 5px;
-                border: none;
                 border-radius: 3px;
                 font-weight: 600;
             }}
-            QPushButton[class="tab"]:hover {{ 
-                background-color: {'#30' + color_utils.darken_color(self.accent_primary, factor=0.9)[1:]};
-                border-radius: 3px;
-                border: 1px solid {'#30' + color_utils.darken_color(self.accent_primary, factor=0.8)[1:]};
+            
+            QPushButton[class="tab"]:hover {{
+                background-color: {'#20' + self.btn_bg_color[1:]};
+            }}
+            
+            QPushButton[class="tab"]:pressed {{
+                background-color: {self.accent_primary};
             }}
             QWidget[class="tab_widget"] {{
-                background: transparent;
-                border: none;
-            }}
-            QWidget[class="tab_widget"]:hover {{
-                background-color: {'#47' + self.accent_primary[1:]};
+                background-color: {'#60' + self.accent_primary[1:]};
+                border: 1px solid {'#80' + self.accent_primary[1:]};
                 border-radius: 3px;
             }}
+            QWidget[class="tab_widget"]:hover {{
+                background-color: {'#80' + self.accent_primary[1:]};
+                border: 1px solid {self.accent_primary};
+            }}
         """)
-
+        
         self.scroll_area.setStyleSheet(f"""
             QScrollArea {{
                 background: transparent;

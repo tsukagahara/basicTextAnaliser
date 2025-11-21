@@ -14,7 +14,7 @@ def open_file_dialog(self):
     
     if file_path:
         file_name = os.path.basename(file_path)
-        directory = os.path.dirname(file_path)
+        directory = os.path.dirname(file_path) + '/' + file_name
         
         return file_name, directory
     return None, None
@@ -46,7 +46,30 @@ def add_json_property(path, property, value):
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
-        data[property] = value
+        if property in data:
+            if value != data[property]:
+                if isinstance(value, str):
+                    old_value = data[property]
+                    del data[property]
+                    res = ''
+                    for j in range(1, len(old_value) + 1):
+                        if old_value[-j] == value[-j]:
+                            res += value[-j]
+                        else:
+                            break
+
+                    new_name = (((value[:-len(res)])[::-1])[:((value[:-len(res)])[::-1]).find('/')])[::-1] + res[::-1]
+                    old_name = (((old_value[:-len(res)])[::-1])[:((old_value[:-len(res)])[::-1]).find('/')])[::-1] + res[::-1] # "Working prototype"
+
+                    # new_name = (value[:-len(res)])[::-1] 
+                    # new_name = (((value[:-len(res)])[::-1])[:new_name.find('/')])[::-1] + res[::-1]
+                    # old_name = (old_value[:-len(res)])[::-1]
+                    # old_name = (old_name[:old_name.find('/')])[::-1] + res[::-1]
+
+                    data[new_name] = value
+                    data[old_name] = old_value
+
+        else: data[property] = value
 
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
